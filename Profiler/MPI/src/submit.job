@@ -1,0 +1,11 @@
+#!/bin/bash
+#SBATCH -J DCUCLUSTER
+#SBATCH -p normal
+#SBATCH -N 1600
+#SBATCH --ntasks-per-node=4
+#SBATCH --cpus-per-task=1
+#SBATCH --gres=dcu:4
+
+export LD_PRELOAD=./pmpi.so
+mpirun ../cluster ../testData.fasta
+
