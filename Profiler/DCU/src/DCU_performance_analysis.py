@@ -191,7 +191,7 @@ class Performance_data_analysis():
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='input file information')
-    parser.add_argument("-i", "--input", dest='input_file', type=str, help='The csv file includes performance counter result collected by Rocprof.')
+    parser.add_argument("-i", "--input_file", dest='input_file', type=str, help='The csv file includes performance counter result collected by Rocprof.')
     args = parser.parse_args()
     performance_analysis = Performance_data_analysis()
-    performance_analysis.visualize_data(input_file)
+    performance_analysis.visualize_data(args.input_file)
