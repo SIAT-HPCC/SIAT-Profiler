@@ -231,7 +231,7 @@ void init() {  // 打开日志文件
     if(mpiRank == 0) {  // 主进程打印一些说明
         sayReadme();
     }
-    logFile<<"进程编号:"<<mpiRank<<endl;
+    logFile<<"thread_no:"<<mpiRank<<endl;
     moveFileCmd = "mv "+fileName+" .";
 }
 
