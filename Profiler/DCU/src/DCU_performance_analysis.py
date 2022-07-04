@@ -118,7 +118,7 @@ class Image_generator():
             # # 显示图形
             # plt.show()
             # 保存图片
-            output_file = os.path.join(output_dir, current_time + data.iloc[i]['KernelName'] + "_radarmap.png")
+            output_file = os.path.join(output_dir, current_time + "_" + data.iloc[i]['KernelName'] + "_radarmap.png")
             plt.savefig(output_file, dpi=200)
             print("Generate radar map successfully! The radar map for " + data.iloc[i]['KernelName'] + " has been saved in " + output_file)
 
