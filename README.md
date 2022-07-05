@@ -101,7 +101,12 @@ rm -rf  /tmp/counter${OMPI_COMM_WORLD_RANK}.txt
 * 将`<运行待测程序的命令>`替换成自己执行程序时所输入的命令及参数
 * -d: 指定采集的硬件计数器数据所存放的目录，可以自行替换
 
-2. 使用`LD_PRELOAD`劫持动态库，并使用`mpirun`来执行`warpper.sh`脚本：
+2. 使用`mpicxx`编译文件`pmpi.cpp`，从而得到本工具需要的动态库文件`pmpi.so`：
+```shell
+mpicxx pmpi.cpp -fPIC -shared -o pmpi.so
+```
+
+3. 使用`LD_PRELOAD`劫持动态库，并使用`mpirun`来执行`warpper.sh`脚本：
 
 ```shell
 export LD_PRELOAD=${pmpi_so_path}/pmpi.so
@@ -110,7 +115,7 @@ mpirun <mpi 运行参数> ./wrapper.sh
 
 ​	其中
 
-* 将`${pmpi_so_path}`替换成`pmpi.so`所在的目录，`pmpi.so`已经放在了目录`./Profiler/MPI/src/` 下
+* 将`${pmpi_so_path}`替换成上一步编译得到的动态库文件`pmpi.so`所在的目录。
 
 * 将`<mpi 运行参数>`替换成mpi执行时的运行参数，比如`-n 4`指定MPI进程数为4。
 
