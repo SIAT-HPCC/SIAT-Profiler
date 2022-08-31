@@ -92,12 +92,19 @@ if __name__ == "__main__":
     input_dir = args.dir_include_data
     output_dir = args.output_dir
     max_thread_num = 6400
-    thread_num, message_num, message_dict, thread_time_dict, thread_data_vol_dict, \
-                                                thread_call_dict, thread_send_list = gri.get_runtime_info(input_dir, max_thread_num) 
+    thread_num, message_num, message_dict, thread_time_dict, \
+                         thread_call_dict, thread_send_list = gri.get_runtime_info(input_dir, max_thread_num) 
 
     cl.draw_bar(os.path.join(output_dir, str(time.strftime('%Y_%m_%d_%H_%M_%S_', time.localtime())) + "count-message.png"), message_dict)
-    cp.draw_bar3d_thread_func_time(thread_time_dict, thread_num, os.path.join(output_dir, str(time.strftime('%Y_%m_%d_%H_%M_%S_', time.localtime())) + "elapsed time of MPI function.png"))
-    cp.draw_bar3d_thread_func_call(thread_call_dict, thread_num, os.path.join(output_dir, str(time.strftime('%Y_%m_%d_%H_%M_%S_', time.localtime())) + "calling times of MPI function.png"))
+
+    step = 64
+    for tid in range(0, thread_num, step):
+        begin_tid = tid
+        end_tid = min(begin_tid + step, thread_num)
+        cp.draw_bar3d_thread_func_time(thread_time_dict, begin_tid, end_tid, os.path.join(output_dir, str(time.strftime('%Y_%m_%d_%H_%M_%S_', time.localtime())) \
+										      		  + "elapsed time of MPI function(pid range:{}-{}).png".format(str(begin_tid), str(end_tid))))
+        cp.draw_bar3d_thread_func_call(thread_call_dict, begin_tid, end_tid, os.path.join(output_dir, str(time.strftime('%Y_%m_%d_%H_%M_%S_', time.localtime())) \
+                                                                                                      + "calling times of MPI function(pid range:{}-{}).png").format(str(begin_tid), str(end_tid)))
     pt = pd.DataFrame(thread_send_list)
     cp.draw_heat_map_thread_send(pt, thread_num, os.path.join(output_dir, str(time.strftime('%Y_%m_%d_%H_%M_%S_', time.localtime())) + "communication_pattern.png")) 
 

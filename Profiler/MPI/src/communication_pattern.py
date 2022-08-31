@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d
 from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.ticker as ticker
 import matplotlib.transforms
 import re
 import seaborn as sns
@@ -201,35 +202,37 @@ def draw_bar3d_thread_func_data_vol(thread_data_vol_dict, thread_num, filename):
     plt.ylim(0, len(mpi_func))
     plt.xlim(0, thread_num)
     
-    
     # 拉伸各方向的比例
-    x_scale=0.5
+    x_scale=0.6
     y_scale=2
     z_scale=0.3
     ax.get_proj = lambda: np.dot(Axes3D.get_proj(ax), np.diag([x_scale, y_scale, z_scale, 1]))
 
-    ax.bar3d(x, y, np.zeros_like(z), dx=0.3, dy=0.3, dz=z)
+    ax.bar3d(x, y, np.zeros_like(z), dx=0.1, dy=0.1, dz=z)
     plt.yticks(_y, [x for x in mpi_func.values()], ha='left', rotation=-15)
     plt.xticks(_x, [str(x) for x in range(0, thread_num)])
     plt.title("MPI各进程调用函数的数据通信量")
     ax.set_xlabel('Rank')
     ax.set_zlabel('Data Vol(KB)', labelpad=20)
-    plt.savefig(filename,dpi=600)
+    plt.savefig(filename, dpi=400)
     plt.show()
     
 
-def draw_bar3d_thread_func_call(thread_call_dict, thread_num, filename):
+def draw_bar3d_thread_func_call(thread_call_dict, begin_tid, end_tid, filename):
 
+    thread_num = end_tid - begin_tid
+    step = int(thread_num / 16)
     x = []
-    _x = range(0, thread_num)
+    # _x = range(begin_tid, end_tid, step)
+    _x = range(0, thread_num, step)
     y = []
     _y = range(0, len(mpi_func))
     z = []
 
     for func_no in mpi_func.keys():
-        for thread in range(0, thread_num):
+        for thread in range(begin_tid, end_tid):
             if thread in thread_call_dict and func_no in thread_call_dict[thread]:
-                x.append(thread)
+                x.append(thread - begin_tid)
                 y.append(int(func_no))
                 z.append(thread_call_dict[thread][func_no])
     
@@ -237,30 +240,31 @@ def draw_bar3d_thread_func_call(thread_call_dict, thread_num, filename):
         print("all function time is zero!")
         return
     
-    fig = plt.figure(figsize=(15,15), dpi=200)
+    fig = plt.figure(figsize=(12,12), dpi=200)
     ax = fig.gca(projection='3d')
     
     # 设置坐标轴的范围
-    plt.ylim(0, len(mpi_func))
-    plt.xlim(0, thread_num)
+    # plt.ylim(0, len(mpi_func))
+    # plt.xlim(begin_tid, end_tid)
     
     # 拉伸各方向的比例
-    x_scale=0.5
-    y_scale=2
-    z_scale=0.3
+    x_scale=1.0
+    y_scale=1.4
+    z_scale=0.4
     ax.get_proj = lambda: np.dot(Axes3D.get_proj(ax), np.diag([x_scale, y_scale, z_scale, 1]))
 
-    ax.bar3d(x, y, np.zeros_like(z), dx=0.3, dy=0.3, dz=z)
-    plt.yticks(_y, [x for x in mpi_func.values()], ha='left', rotation=-15)
-    plt.xticks(_x, [str(x) for x in range(0, thread_num)])
+    ax.bar3d(x, y, np.zeros_like(z), dx=0.1, dy=0.2, dz=z)
     ax.set_xlabel('Rank')
     ax.set_zlabel('Call Times', labelpad=20)    
+    plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
+    plt.yticks(_y, [x for x in mpi_func.values()], ha='left', rotation=-15)
+    plt.xticks(_x, [str(x) for x in range(begin_tid, end_tid, step)])
     plt.title("The number of times the MPI process calls MPI functions")
-    plt.savefig(filename,dpi=600)
-    plt.show()
-    print("draw the number of times the MPI process calls MPI functions successfully.")
+    plt.savefig(filename, dpi=200)
+    # plt.show()
+    print("draw the number of times the MPI process calls MPI functions successfully.(pid range:{}-{})".format(str(begin_tid), str(end_tid)))
     
-def draw_bar3d_thread_func_time(thread_time_dict, thread_num, filename):
+def draw_bar3d_thread_func_time(thread_time_dict, begin_tid, end_tid, filename):
 #     _x = []
 #     _y = []
 #     z = []
@@ -272,8 +276,10 @@ def draw_bar3d_thread_func_time(thread_time_dict, thread_num, filename):
 #     _xx, _yy = np.meshgrid(_x, _y)
 #     x, y = _xx.ravel(), _yy.ravel()
 
+    thread_num = end_tid - begin_tid
+    step = int(thread_num / 16)
     x = []
-    _x = range(0, thread_num)
+    _x = range(begin_tid, end_tid, step)
     y = []
     _y = range(0, len(mpi_func))
     z = []
@@ -285,7 +291,7 @@ def draw_bar3d_thread_func_time(thread_time_dict, thread_num, filename):
 #             else:
 #                 z.append(0)
     for func_no in mpi_func.keys():
-        for thread in range(0, thread_num):
+        for thread in range(begin_tid, end_tid):
             if thread in thread_time_dict and func_no in thread_time_dict[thread]:
                 x.append(thread)
                 y.append(int(func_no))
@@ -299,14 +305,14 @@ def draw_bar3d_thread_func_time(thread_time_dict, thread_num, filename):
     ax = fig.gca(projection='3d')
     
     # 设置坐标轴的范围
-    plt.ylim(0, len(mpi_func))
-    plt.xlim(0, thread_num)
-    
+    # plt.ylim(0, len(mpi_func))
+    # plt.xlim(0, thread_num)
+    plt.xlim(begin_tid, end_tid)
     
     # 拉伸各方向的比例
-    x_scale=0.5
-    y_scale=2
-    z_scale=0.3
+    x_scale=1.0
+    y_scale=1.4
+    z_scale=0.4
     ax.get_proj = lambda: np.dot(Axes3D.get_proj(ax), np.diag([x_scale, y_scale, z_scale, 1]))
     
 # 移动x轴刻度的代码，不管用    
@@ -331,15 +337,15 @@ def draw_bar3d_thread_func_time(thread_time_dict, thread_num, filename):
 #         label.set_x(label.get_position()[1] - (i % 2) * 0.075)
 #     print(_y)
 
-    ax.bar3d(x, y, np.zeros_like(z), dx=0.3, dy=0.3, dz=z)
+    ax.bar3d(x, y, np.zeros_like(z), dx=0.1, dy=0.1, dz=z)
     plt.yticks(_y, [x for x in mpi_func.values()], ha='left', rotation=-15)
-    plt.xticks(_x, [str(x) for x in range(0, thread_num)])
+    plt.xticks(_x, [str(x) for x in range(begin_tid, end_tid, step)])
     ax.set_xlabel('Rank')
     ax.set_zlabel('Time(seconds)', labelpad=20)
     plt.title("The elapsed time of MPI functions called by MPI process")
-    plt.savefig(filename,dpi=600)
-    plt.show()
-    print("draw the elapsed time of MPI functions called by MPI process successfully.")
+    plt.savefig(filename, dpi=200)
+    # plt.show()
+    print("draw the elapsed time of MPI functions called by MPI process successfully.(pid range:{}-{})".format(str(begin_tid), str(end_tid)))
     
 def draw_bar3d_thread_send(thread_send_list, thread_num):
 #     _x = [x for x in range(0, thread_num)]
@@ -378,6 +384,7 @@ def draw_bar3d_thread_send(thread_send_list, thread_num):
     plt.ylim(0, thread_num)
     plt.xlim(0, thread_num)
     
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(4))
     ax.bar3d(x, y, np.zeros_like(z), dx=1, dy=1, dz=z, alpha=0.7)
     plt.xticks(_x, [str(x) for x in range(0, thread_num)])
     plt.yticks(_y, [str(x) for x in range(0, thread_num)], ha='left', rotation=-15)

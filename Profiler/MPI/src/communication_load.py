@@ -85,6 +85,6 @@ def draw_bar(filename, message_dict):
 #     fig = plt.figure(figsize=(10,10), dpi=200)
     # plt.xticks(rotation=60)
     plt.title("MPI message size and MPI message number statistics")
-    plt.savefig(filename, dpi=200)
+    plt.savefig(filename, dpi=400, bbox_inches='tight')
     # plt.show()
     print("draw MPI message size and MPI message number statistics successfully.")
