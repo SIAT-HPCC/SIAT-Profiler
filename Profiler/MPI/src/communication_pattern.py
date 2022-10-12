@@ -393,17 +393,17 @@ def draw_bar3d_thread_send(thread_send_list, thread_num):
 #     plt.savefig('filename1.png',dpi=600)
     plt.show()
     
-def draw_heat_map_thread_send(pt, thread_num, output_path):
+def draw_heat_map_thread_send(pt, begin_tid, end_tid, output_path):
     fig, ax = plt.subplots(figsize = (10,8))
     # print(thread_send_list)
     
-    res = pt
+    res = pt.iloc[begin_tid: end_tid, begin_tid: end_tid]
     # print(type(res))
     # 如果MPI进程数大于32，则限制只输出32个MPI进程的结果
     # if thread_num > 32:
     #     res = pt.iloc[0:32, 0:32]
     # cmap用matplotlib colormap
-    print(res)
+    # print(res)
     max_vol = max(res)
     min_vol = min(res)
     # sns.heatmap(res, linewidths = 0.05, ax = ax, cmap='rainbow') 

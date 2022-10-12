@@ -111,7 +111,8 @@ class Image_generator():
             # 设置雷达图的范围
             ax.set_ylim(0,100)
             # 标题
-            plt.title(data.iloc[i]['KernelName'], pad=25)
+            # plt.title(data.iloc[i]['KernelName'], pad=25)
+            plt.title(data.iloc[i]['KernelName'])
             
             # 添加网格线
             ax.grid(True)

@@ -93,7 +93,7 @@ if __name__ == "__main__":
     output_dir = args.output_dir
     max_thread_num = 6400
     thread_num, message_num, message_dict, thread_time_dict, \
-                         thread_call_dict, thread_send_list = gri.get_runtime_info(input_dir, max_thread_num) 
+                         thread_call_dict, thread_send_list = gri.get_runtime_info(input_dir, max_thread_num)
 
     cl.draw_bar(os.path.join(output_dir, str(time.strftime('%Y_%m_%d_%H_%M_%S_', time.localtime())) + "count-message.png"), message_dict)
 
@@ -102,11 +102,16 @@ if __name__ == "__main__":
         begin_tid = tid
         end_tid = min(begin_tid + step, thread_num)
         cp.draw_bar3d_thread_func_time(thread_time_dict, begin_tid, end_tid, os.path.join(output_dir, str(time.strftime('%Y_%m_%d_%H_%M_%S_', time.localtime())) \
-										      		  + "elapsed time of MPI function(pid range:{}-{}).png".format(str(begin_tid), str(end_tid))))
+                                                                                          + "elapsed_time_of_MPI_function_pid_range{}-{}.png".format(str(begin_tid), str(end_tid))))
         cp.draw_bar3d_thread_func_call(thread_call_dict, begin_tid, end_tid, os.path.join(output_dir, str(time.strftime('%Y_%m_%d_%H_%M_%S_', time.localtime())) \
-                                                                                                      + "calling times of MPI function(pid range:{}-{}).png").format(str(begin_tid), str(end_tid)))
+                                                                                                     + "calling_times_of_MPI_function_pid_range{}-{}.png").format(str(begin_tid), str(end_tid)))
     pt = pd.DataFrame(thread_send_list)
-    cp.draw_heat_map_thread_send(pt, thread_num, os.path.join(output_dir, str(time.strftime('%Y_%m_%d_%H_%M_%S_', time.localtime())) + "communication_pattern.png")) 
+    step = 128
+    for tid in range(0, thread_num, step):
+        begin_tid = tid
+        end_tid = min(begin_tid + step, thread_num)
+        cp.draw_heat_map_thread_send(pt, begin_tid, end_tid, os.path.join(output_dir, str(time.strftime('%Y_%m_%d_%H_%M_%S_', time.localtime())) + "communication_pattern_pid_range{}-{}.png").format(str(begin_tid), str(end_tid)))
+        # cp.draw_heat_map_thread_send(pt, thread_num, os.path.join(output_dir, str(time.strftime('%Y_%m_%d_%H_%M_%S_', time.localtime())) + "communication_pattern.png"))
 
     # draw_communication_load(args.dir_include_data, args.output_dir)
     # draw_communication_pattern(args.dir_include_data, args.output_dir)
